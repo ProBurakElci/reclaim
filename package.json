@@ -1,0 +1,17 @@
+{
+  "name": "reclaim-cli",
+  "version": "1.0.0",
+  "description": "Find the build artifacts eating your disk - node_modules, venv, target, build caches - and delete them safely. Zero dependencies, dry run by default.",
+  "bin": { "reclaim": "bin/reclaim.js" },
+  "main": "lib/scan.js",
+  "files": ["bin", "lib", "README.md", "LICENSE"],
+  "scripts": { "test": "node test/run-tests.js" },
+  "keywords": [
+    "disk-space", "cleanup", "node_modules", "build-artifacts", "cli",
+    "developer-tools", "housekeeping", "zero-dependencies", "disk-usage"
+  ],
+  "license": "MIT",
+  "engines": { "node": ">=14" },
+  "repository": { "type": "git", "url": "git+https://github.com/ProBurakElci/reclaim.git" },
+  "homepage": "https://github.com/ProBurakElci/reclaim#readme"
+}
