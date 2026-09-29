@@ -82,7 +82,7 @@ function humanSize(bytes) {
 }
 
 function humanAge(days) {
-  if (!isFinite(days)) return "unknown";
+  if (days === null || days === undefined) return "unknown";
   if (days === 0) return "today";
   if (days === 1) return "yesterday";
   if (days < 30) return days + " days ago";
@@ -177,7 +177,7 @@ async function main() {
   for (const item of shown) {
     const age = daysSince(item.lastTouched);
     const ageText = humanAge(age);
-    const ageColor = age >= 180 ? red : age >= 60 ? yellow : dim;
+    const ageColor = age === null ? dim : age >= 180 ? red : age >= 60 ? yellow : dim;
 
     console.log(
       "  " + cyan(bar(item.bytes / biggest, 14)) + "  " +
@@ -186,7 +186,7 @@ async function main() {
     );
     console.log(
       "  " + " ".repeat(16) + dim(item.ecosystem) + dim("  -  ") +
-      ageColor("last touched " + ageText) +
+      ageColor(age === null ? "age unknown" : "last touched " + ageText) +
       dim("  -  " + item.files.toLocaleString("en-US") + " files")
     );
   }

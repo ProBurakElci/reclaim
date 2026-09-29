@@ -196,7 +196,9 @@ const items = [
 eq("nothing is older than 365 days", olderThan(items, 365).length, 0);
 eq("two are older than 30 days", olderThan(items, 30).length, 2);
 eq("one is older than 100 days", olderThan(items, 100).length, 1);
-ok("daysSince handles a missing timestamp", !isFinite(daysSince(0)));
+eq("daysSince returns null when there is nothing to date it by", daysSince(0), null);
+eq("an unknown age is never treated as old",
+  olderThan([{ bytes: 1, lastTouched: 0 }], 90).length, 0);
 
 // A directory's mtime changes whenever anything lands inside it, so an old
 // dependency tree copied onto a new machine would look brand new if directory
@@ -270,7 +272,8 @@ const json = runCli([root, "--json"]);
 const parsed = JSON.parse(json.out);
 ok("json lists items", Array.isArray(parsed.items) && parsed.items.length > 0);
 ok("json has a total", typeof parsed.totalBytes === "number");
-ok("json items carry an age", parsed.items.every((i) => typeof i.daysSinceTouched === "number"));
+ok("json items carry an age, or null when it cannot be known",
+  parsed.items.every((i) => typeof i.daysSinceTouched === "number" || i.daysSinceTouched === null));
 
 const filtered = runCli([root, "--older-than", "3650", "--json"]);
 eq("an impossible age filter returns nothing", JSON.parse(filtered.out).items.length, 0);
