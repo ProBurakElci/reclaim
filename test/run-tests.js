@@ -11,7 +11,7 @@ const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const { execFileSync } = require("child_process");
-const { scan, measure, totalBytes, daysSince, olderThan } = require("../lib/scan");
+const { scan, measure, lastTouched, totalBytes, daysSince, olderThan } = require("../lib/scan");
 const { canRemove, remove, removeAll, isInside, isDangerousRoot } = require("../lib/remove");
 
 let passed = 0;
@@ -197,6 +197,21 @@ eq("nothing is older than 365 days", olderThan(items, 365).length, 0);
 eq("two are older than 30 days", olderThan(items, 30).length, 2);
 eq("one is older than 100 days", olderThan(items, 100).length, 1);
 ok("daysSince handles a missing timestamp", !isFinite(daysSince(0)));
+
+// A directory's mtime changes whenever anything lands inside it, so an old
+// dependency tree copied onto a new machine would look brand new if directory
+// times counted. Only file times may count.
+const agedRoot = path.join(root, "aged");
+fs.mkdirSync(path.join(agedRoot, "node_modules", "pkg"), { recursive: true });
+fs.writeFileSync(path.join(agedRoot, "package.json"), "{}");
+const agedFile = path.join(agedRoot, "node_modules", "pkg", "index.js");
+fs.writeFileSync(agedFile, "old");
+const longAgo = new Date(Date.now() - 300 * 86400000);
+fs.utimesSync(agedFile, longAgo, longAgo);
+
+const agedAge = daysSince(lastTouched(path.join(agedRoot, "node_modules")));
+ok("an old tree in a fresh directory still reads as old (got " + agedAge + " days)",
+  agedAge >= 290);
 
 /* ---------------- symlinks ---------------- */
 
